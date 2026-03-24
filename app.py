@@ -64,6 +64,8 @@ def health() -> Any:
 @app.route("/predict", methods=["POST"])
 def predict() -> Any:
 	try:
+		print("[INFO] POST /predict received")
+
 		if not MODEL_LOADED or MODEL is None:
 			return (
 				jsonify(
@@ -76,7 +78,7 @@ def predict() -> Any:
 				503,
 			)
 
-		payload = request.get_json(silent=True)
+		payload = request.json
 		if not payload:
 			return (
 				jsonify(
@@ -115,6 +117,7 @@ def predict() -> Any:
 			slow_probability = float(row_prob[1]) if len(row_prob) > 1 else float(row_prob[0])
 			response["slow_learner_probability"] = round(slow_probability * 100, 2)
 
+		print("[INFO] POST /predict success")
 		return jsonify(response), 200
 	except Exception as exc:
 		print(f"[ERROR] Prediction failed: {str(exc)}")

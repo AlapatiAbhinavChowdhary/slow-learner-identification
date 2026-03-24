@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 
 const ENV_API_BASE = import.meta.env.VITE_API_BASE_URL || ''
-const API_BASE = (ENV_API_BASE.trim() || window.location.origin).replace(/\/$/, '')
+const API_BASE = ENV_API_BASE.trim().replace(/\/$/, '')
 
 console.info('[Config] VITE_API_BASE_URL:', ENV_API_BASE || '(not set)')
 if (!ENV_API_BASE.trim()) {
-  console.warn('[Config] VITE_API_BASE_URL is missing. Falling back to window.location.origin:', API_BASE)
+  console.error('[Config] VITE_API_BASE_URL is missing. Set it in Render environment variables.')
 }
 
 const defaultStats = {
@@ -51,8 +51,15 @@ function App() {
   const [darkMode, setDarkMode] = useState(false)
 
   useEffect(() => {
+    if (!API_BASE) {
+      setError('VITE_API_BASE_URL is not set. Please configure it in Render.')
+      setLoadingStats(false)
+      return
+    }
+
     fetch(`${API_BASE}/stats`)
       .then(async (res) => {
+        console.info('[API] GET /stats status:', res.status)
         if (!res.ok) {
           throw new Error('Failed to load statistics from backend.')
         }
@@ -62,6 +69,7 @@ function App() {
         setStats({ ...defaultStats, ...data })
       })
       .catch((err) => {
+        console.error('[API] GET /stats failed:', err)
         setError(err.message)
       })
       .finally(() => {
@@ -85,20 +93,28 @@ function App() {
     setError('')
 
     try {
+      if (!import.meta.env.VITE_API_BASE_URL) {
+        throw new Error('VITE_API_BASE_URL is not set. Please configure it in Render.')
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       })
+      console.info('[API] POST /predict status:', response.status)
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}))
+        console.error('[API] POST /predict error payload:', payload)
         throw new Error(payload.error || 'Prediction failed.')
       }
 
       const data = await response.json()
+      console.info('[API] POST /predict success:', data)
       setPrediction(data)
     } catch (err) {
+      console.error('[API] POST /predict failed:', err)
       setError(err.message)
     } finally {
       setLoadingPredict(false)
@@ -117,6 +133,10 @@ function App() {
     setError('')
 
     try {
+      if (!API_BASE) {
+        throw new Error('VITE_API_BASE_URL is not set. Please configure it in Render.')
+      }
+
       const formData = new FormData()
       formData.append('file', file)
 
@@ -124,16 +144,20 @@ function App() {
         method: 'POST',
         body: formData
       })
+      console.info('[API] POST /bulk_predict status:', response.status)
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}))
+        console.error('[API] POST /bulk_predict error payload:', payload)
         throw new Error(payload.error || 'Bulk prediction failed.')
       }
 
       const data = await response.json()
+      console.info('[API] POST /bulk_predict success:', data)
       setBulkResults(data.results || [])
       setActiveTab('bulk')
     } catch (err) {
+      console.error('[API] POST /bulk_predict failed:', err)
       setError(err.message)
     } finally {
       setBulkLoading(false)
