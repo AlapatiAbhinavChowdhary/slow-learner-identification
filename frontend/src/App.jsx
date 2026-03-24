@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 
-const API_BASE = 'http://localhost:5000'
+const ENV_API_BASE = import.meta.env.VITE_API_BASE_URL || ''
+const API_BASE = (ENV_API_BASE.trim() || window.location.origin).replace(/\/$/, '')
+
+console.info('[Config] VITE_API_BASE_URL:', ENV_API_BASE || '(not set)')
+if (!ENV_API_BASE.trim()) {
+  console.warn('[Config] VITE_API_BASE_URL is missing. Falling back to window.location.origin:', API_BASE)
+}
 
 const defaultStats = {
   total_students: 0,
