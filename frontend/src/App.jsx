@@ -93,11 +93,11 @@ function App() {
     setError('')
 
     try {
-      if (!import.meta.env.VITE_API_BASE_URL) {
+      if (!API_BASE) {
         throw new Error('VITE_API_BASE_URL is not set. Please configure it in Render.')
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/predict`, {
+      const response = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -271,7 +271,7 @@ used in conjunction with teacher observations and domain expertise.
     }
     
     // If predicted as Slow Learner, use confidence to determine severity
-    const conf = prediction.confidence
+    const conf = Number(prediction.confidence || 0)
     if (conf > 80) return { level: 'Critical', color: '#dc2626' }
     if (conf > 60) return { level: 'High', color: '#f97316' }
     if (conf > 40) return { level: 'Moderate', color: '#eab308' }
