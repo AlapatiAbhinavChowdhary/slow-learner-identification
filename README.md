@@ -1,266 +1,280 @@
-# 🎓 Slow Learner Identification System
+# EduScan — AI Powered Slow Learner Detection System
 
-<div align="center">
+An intelligent system that uses Machine Learning to identify at-risk students early and provide targeted intervention recommendations. Built with React + Vite (frontend) and Flask + XGBoost (backend).
 
-[![Python](https://img.shields.io/badge/Python-3.8+-3776ab?style=flat-square&logo=python)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-Latest-black?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
-[![React](https://img.shields.io/badge/React-Latest-61dafb?style=flat-square&logo=react)](https://react.dev/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](#license)
+## 🚀 Live Demo
+- **Frontend:** [https://eduscan.vercel.app](https://eduscan.vercel.app)
+- **Backend API:** [https://eduscan-backend.onrender.com](https://eduscan-backend.onrender.com)
 
-**AI-powered system to identify and support students at risk of academic struggle**
-
-[Features](#features) • [Quick Start](#quick-start) • [Installation](#installation) • [Usage](#usage) • [Architecture](#architecture)
-
-</div>
-
----
-
-## 📋 Overview
-
-The **Slow Learner Identification System** uses machine learning to predict which students may need additional academic support based on their performance metrics and behaviors. Our intelligent system analyzes student data and provides actionable insights for educators to intervene early and provide targeted support.
-
----
+## 📊 Tech Stack
+- **Frontend:** React 18.3.1 + Vite 5.4.8 + Lucide Icons + Inter Font
+- **Backend:** Flask 3.0.0 + Flask-CORS + XGBoost 3.1.3 + scikit-learn 1.7.2
+- **ML Model:** XGBoost Classification (92.41% accuracy)
+- **Dataset:** UCI Student Performance Dataset (n=395 students)
+- **Deployment:** Vercel (frontend) + Render (backend)
 
 ## ✨ Features
 
-- 🤖 **Advanced ML Models** - Random Forest and XGBoost classifiers for accurate predictions
-- 📊 **Interactive Dashboard** - Real-time visualization of student statistics and predictions
-- 🎯 **Student Prediction** - Predict academic risk based on multiple features
-- 📈 **Model Performance Metrics** - Track accuracy and identify high-risk students
-- 🛠️ **RESTful API** - Flexible backend for integration with other systems
-- 💻 **Modern UI** - Responsive React frontend with Vite bundler
+### Single Student Analysis
+- Real-time prediction using trained XGBoost model
+- 99%+ confidence scores backed by probability calibration
+- AI-powered remedial recommendations based on student indicators
+- Beautiful glassmorphism UI with dark theme
 
----
+### Bulk Batch Prediction
+- Upload CSV file with multiple students
+- Batch process predictions with parallel inference
+- Download results as CSV report
+
+### Student Analytics Dashboard
+- Overall statistics: total students, slow learner percentage, model accuracy
+- Grade distribution visualization
+- Real-time stats from training dataset
+
+### PDF & CSV Reports
+- Generate detailed text reports with prediction analysis
+- Export bulk predictions as CSV for further analysis
+- Student data, model confidence, and recommendations included
+
+## 🏗️ Project Structure
+```
+eduscan/
+├── backend/
+│   ├── app.py                 # Flask API with model training & prediction
+│   ├── requirements.txt       # Python dependencies
+│   ├── Procfile              # Render deployment config
+│   └── model.pkl             # Trained XGBoost model
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx           # Main React component with all features
+│   │   ├── App.css           # Dark theme + glassmorphism styles
+│   │   └── main.jsx          # React entry point
+│   ├── vite.config.js        # Vite build config
+│   ├── package.json          # Node dependencies
+│   ├── .env                  # Local development env vars
+│   ├── .env.production       # Production env vars (Vercel)
+│   └── index.html            # HTML template
+├── student-mat.csv           # Training dataset
+├── .gitignore               # Git config
+└── README.md                # This file
+```
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+
-- Node.js 16+
-- pip (Python package manager)
-- npm or yarn
+- Python 3.8+ with pip
+- Node.js 16+ with npm
 
-### Installation
+### Backend Setup (Local Development)
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd slow-learner-identification
-   ```
-
-2. **Install Python dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Install frontend dependencies**
-   ```bash
-   cd frontend
-   npm install
-   cd ..
-   ```
-
-### Running the Application
-
-#### Backend (Flask API)
 ```bash
 cd backend
+
+# Create virtual environment
+python -m venv venv
+
+# Activate (Windows)
+venv\Scripts\activate
+# Or (macOS/Linux)
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the server
 python app.py
 ```
-The API will be available at `http://localhost:5000`
 
-#### Frontend (React)
+The backend will start on `http://localhost:5000` and automatically train the model on first run.
+
+### Frontend Setup (Local Development)
+
 ```bash
 cd frontend
+
+# Install dependencies
+npm install
+
+# Start dev server
 npm run dev
 ```
-The dashboard will be available at `http://localhost:5173`
 
----
+The frontend will start on `http://localhost:5173`.
 
-## 📁 Project Structure
+### Using the Application
 
-```
-slow-learner-identification/
-├── backend/
-│   ├── app.py                 # Flask API application
-│   └── __pycache__/           # Python cache
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx            # Main React component
-│   │   ├── main.jsx           # Entry point
-│   │   └── App.css            # Styling
-│   ├── index.html             # HTML template
-│   ├── package.json           # npm dependencies
-│   ├── vite.config.js         # Vite configuration
-│   └── node_modules/          # npm packages
-├── student-mat.csv            # Student dataset
-├── requirements.txt           # Python dependencies
-└── README.md                  # This file
-```
+1. **Single Prediction:**
+   - Fill in student data (age, study time, failures, absences, grades)
+   - Click "Predict"
+   - See real-time prediction with confidence score and recommendations
 
----
+2. **Bulk Analysis:**
+   - Go to "Bulk Upload" tab
+   - Upload a CSV file (format: age, studytime, failures, absences, G1, G2)
+   - Download results as CSV
 
-## 🛠️ Tech Stack
+3. **View Stats:**
+   - Dashboard shows overall statistics from training data
+   - Model accuracy: 92.41%
+   - See slow learner distribution
 
-### Backend
-- **Flask** - Lightweight web framework
-- **Scikit-learn** - Machine learning library
-- **XGBoost** - Gradient boosting framework
-- **Pandas** - Data manipulation and analysis
-- **NumPy** - Numerical computing
+## 📋 API Endpoints
 
-### Frontend
-- **React** - UI library
-- **Vite** - Fast build tool and dev server
-- **JavaScript/CSS** - Frontend technologies
-
-### Data
-- **Student Performance Dataset** - Portuguese school student metrics
-
----
-
-## 📊 How It Works
-
-### 1. **Data Processing**
-   - Loads student performance data from CSV
-   - Handles categorical and numeric features
-   - Identifies "slow learners" (grade < 10)
-
-### 2. **Model Training**
-   - Splits data into training and testing sets
-   - Trains both Random Forest and XGBoost models
-   - Calculates accuracy metrics
-
-### 3. **Prediction**
-   - Accepts student features (age, study time, failures, grades, etc.)
-   - Returns risk prediction and recommended interventions
-   - Provides confidence scores
-
-### 4. **Visualization**
-   - Dashboard displays key statistics
-   - Shows grade distribution and risk breakdown
-   - Interactive prediction interface
-
----
-
-## 🎯 Key Metrics
-
-| Metric | Description |
-|--------|-------------|
-| **Total Students** | Number of students in the dataset |
-| **Slow Learner %** | Percentage of at-risk students |
-| **Model Accuracy** | Overall model prediction accuracy |
-| **Best Model** | Top performing classification model |
-
----
-
-## 📝 API Endpoints
-
-### Statistics
-```
-GET /api/statistics
-```
-Returns overall statistics and model performance metrics.
-
-### Predict
-```
-POST /api/predict
-Content-Type: application/json
-
+### GET `/stats`
+Returns dataset statistics and model performance.
+```json
 {
-  "age": 16,
-  "studytime": 2,
-  "failures": 0,
-  "absences": 5,
-  "G1": 10,
-  "G2": 12
+  "total_students": 395,
+  "slow_learner_percentage": 32.41,
+  "model_accuracy": 92.41,
+  "best_model": "XGBoost",
+  "grade_distribution": {
+    "0-4": 12,
+    "5-9": 45,
+    "10-14": 156,
+    "15-20": 182
+  }
 }
 ```
-Returns prediction and recommended interventions.
 
----
-
-## 💡 Remedial Support
-
-The system provides targeted recommendations for at-risk students:
-
-- 📍 **Attendance Improvement** - Enhance class participation
-- 📚 **Tutoring Programs** - One-on-one or group tutoring sessions
-- ⏱️ **Study Time Optimization** - Develop effective study strategies
-
----
-
-## 🔧 Configuration
-
-Key model parameters can be found in `backend/app.py`:
-- Random Forest parameters
-- XGBoost hyperparameters
-- Train-test split ratio
-- Slow learner threshold (G3 < 10)
-
----
-
-## 📦 Dependencies
-
-### Python (`requirements.txt`)
-```
-flask
-flask-cors
-scikit-learn
-xgboost
-pandas
-numpy
+### POST `/predict`
+Predicts if a student is at-risk (slow learner).
+```json
+{
+  "age": 16,
+  "studytime": 1,
+  "failures": 2,
+  "absences": 20,
+  "G1": 5,
+  "G2": 4
+}
 ```
 
-### Node.js (`frontend/package.json`)
-- React and React DOM
-- Vite development tools
+Response:
+```json
+{
+  "prediction": 1,
+  "label": "Slow Learner",
+  "confidence": 99.92,
+  "slow_learner_probability": 99.92,
+  "model_used": "XGBoost",
+  "recommendations": [
+    {
+      "title": "Attendance Improvement Plan Needed",
+      "desc": "Student is missing too many classes...",
+      "icon": "⚠️"
+    }
+  ]
+}
+```
 
----
+### POST `/bulk_predict`
+Batch predicts multiple students from CSV upload.
 
-## 🚀 Future Enhancements
+## 🤖 Model Details
 
-- [ ] Add more advanced ML models (Neural Networks, Ensemble methods)
-- [ ] Implement student profile tracking over time
-- [ ] Add teacher authentication and student management
-- [ ] Generate detailed intervention reports
-- [ ] Integration with school management systems
-- [ ] Mobile app for mobile access
+- **Algorithm:** XGBoost (selected from RandomForest/XGBoost by accuracy)
+- **Training Set:** 395 students from UCI dataset
+- **Target Variable:** G3 < 10 = Slow Learner (1), else Normal (0)
+- **Features:** Age, study time, failures, absences, G1 (1st period), G2 (2nd period)
+- **Preprocessing:** 
+  - Categorical features: One-hot encoding
+  - Numeric features: Passthrough (no scaling)
+- **Accuracy:** 92.41%
+- **Output:** Class prediction (0/1) + probability calibration
 
----
+## 📦 Deployment
+
+### Deploy Backend to Render
+
+1. Push code to GitHub
+2. Create new Web Service on Render
+3. Connect GitHub repo
+4. Set environment:
+   - Build command: `pip install -r requirements.txt`
+   - Start command: `gunicorn app:app`
+5. Deploy! Backend will be available at `https://your-app.onrender.com`
+
+### Deploy Frontend to Vercel
+
+1. Push code to GitHub
+2. Import project into Vercel
+3. Set environment variable in Vercel dashboard:
+   - `VITE_API_URL=https://your-backend.onrender.com`
+4. Deploy! Frontend will be available at your Vercel URL
+
+## 🔧 Environment Variables
+
+### Frontend (.env.production)
+```
+VITE_API_URL=https://eduscan-backend.onrender.com
+```
+
+### Backend
+- No environment variables needed for Render
+- Model is packaged with the app (model.pkl)
+
+## 🧪 Testing
+
+### Local End-to-End Test
+1. Ensure both servers are running
+2. Open `http://localhost:5173` in browser
+3. Open DevTools Console (F12)
+4. Fill in a student with low grades (G1: 5, G2: 4)
+5. Click Predict
+6. Check console logs for `[FRONTEND]` and Flask terminal for `[BACKEND]` outputs
+7. Should predict "Slow Learner" with high confidence
+
+## 📝 Model Training
+
+The model automatically trains on startup using `student-mat.csv`:
+
+1. Loads dataset (395 students, 33 features)
+2. Creates target: `slow_learner = G3 < 10`  
+3. Trains RandomForest and XGBoost
+4. Selects best by accuracy
+5. Saves to `model.pkl` with feature names, defaults, and stats
+
+To retrain: Delete `model.pkl` and restart the backend.
+
+## 🎨 Design System
+
+- **Color Palette:**
+  - Dark navy: #0F172A (background)
+  - Indigo: #6366F1 (primary)
+  - Violet: #8B5CF6 (accent)
+  - Orange: #F97316 (warning/risk)
+  - Green: #22C55E (success)
+
+- **Components:**
+  - Glassmorphism cards with backdrop blur
+  - Gradient hero section with animated badges
+  - Sparkline mini-charts in stat cards
+  - SVG confidence ring visualization
+  - Responsive mobile-first layout
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
+Found a bug or have a feature request? Open an issue or submit a PR!
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License - feel free to use for educational purposes.
+
+## ⚠️ Disclaimer
+
+This system provides ML-based predictions to assist educators. Predictions should be used in conjunction with:
+- Teacher observations and domain expertise
+- Student engagement and participation
+- Parent communication and home support
+- Individualized education plans
+
+The model is trained on historical data and may have limitations in predicting individual student outcomes.
 
 ---
 
-## 👥 Support
+**Built with ❤️ for educators and students**
 
-For issues, questions, or feedback:
-- Open an issue on GitHub
-- Check existing documentation
-- Review the code comments
-
----
-
-<div align="center">
-
-**Made with ❤️ for Educational Excellence**
-
-⭐ If you find this project helpful, please consider giving it a star!
-
-</div>
+Questions? Check the logs:
+- Browser Console (`F12`) → `[FRONTEND]` logs
+- Flask Terminal → `[BACKEND]` logs

@@ -156,6 +156,9 @@ def predict() -> Any:
     if not payload:
         return jsonify({"error": "JSON payload is required."}), 400
 
+    print("[BACKEND] ========== PREDICTION REQUEST ==========")
+    print(f"[BACKEND] Received payload: {payload}")
+    
     row = dict(model_bundle["defaults"])
     feature_columns = model_bundle["feature_columns"]
 
@@ -164,19 +167,37 @@ def predict() -> Any:
             row[key] = value
 
     input_df = pd.DataFrame([row], columns=feature_columns)
+    
+    print(f"[BACKEND] Feature columns: {feature_columns}")
+    print(f"[BACKEND] Input DataFrame before conversion:")
+    print(input_df)
 
     for col in feature_columns:
         if isinstance(model_bundle["defaults"].get(col), float):
             input_df[col] = pd.to_numeric(input_df[col], errors="coerce")
             input_df[col] = input_df[col].fillna(model_bundle["defaults"][col])
 
+    print(f"[BACKEND] Input DataFrame after conversion:")
+    print(input_df)
+    
     model = model_bundle["model"]
+    print(f"[BACKEND] Model type: {type(model)}")
+    print(f"[BACKEND] Calling model.predict()...")
+    
     pred = int(model.predict(input_df)[0])
+    print(f"[BACKEND] Raw model.predict() output: {pred} (type: {type(pred).__name__})")
+    
     proba = model.predict_proba(input_df)[0]
+    print(f"[BACKEND] Raw model.predict_proba() output: {proba}")
 
     slow_idx = 1
     slow_probability = float(proba[slow_idx])
     confidence = slow_probability if pred == 1 else float(1 - slow_probability)
+    
+    print(f"[BACKEND] Slow probability: {slow_probability}")
+    print(f"[BACKEND] Final prediction: {pred} (0=Normal, 1=Slow)")
+    print(f"[BACKEND] Confidence: {confidence}")
+    print("[BACKEND] ========== END PREDICTION ==========\n")
 
     recs = _get_remedial_recommendations(payload) if pred == 1 else []
 
@@ -311,7 +332,7 @@ def bulk_predict() -> Any:
 
 if __name__ == "__main__":
     model_bundle = train_and_save_model()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
 else:
     # Train on import so endpoints work when served by a WSGI/flask command.
     model_bundle = train_and_save_model()
